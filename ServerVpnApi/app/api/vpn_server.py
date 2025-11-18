@@ -13,12 +13,16 @@ async def add_client(
         telegram_id: int,
         token: str = Depends(validate_connection_token),
 ):
-    # await xray_manager.add_client_to_config(telegram_id)
-    # vless_config = vless_manager.generate_vless_url(telegram_id)
-    vless_config = uuid.uuid4()
+    # Добавляем клиента в конфиг и получаем его UUID
+    client_uuid = await xray_manager.add_client_to_config(telegram_id)
+    
+    # Генерируем полный VLESS конфиг
+    vless_config = vless_manager.generate_vless_url(client_uuid, telegram_id)
 
     return {
         "info": "Конфиг был создан",
+        "telegram_id": telegram_id,
+        "client_uuid": client_uuid,
         "vless_config": vless_config
     }
 
@@ -30,13 +34,8 @@ async def delete_client(
 ):
     """Удаление клиента"""
 
-    #await xray_manager.remove_client_from_config(telegram_id)
+    await xray_manager.remove_client_from_config(telegram_id)
 
     return {
-        "info": "Конфиг удален"
+        "info": f"Конфиг для Telegram ID {telegram_id} удален"
     }
-
-
-
-
-
